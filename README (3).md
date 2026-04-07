@@ -1,11 +1,15 @@
-# 🚀 Hands-on L11: AWS Core Services — S3, Glue, CloudWatch & Athena
+#Hands-on L11: AWS Core Services — S3, Glue, CloudWatch & Athena
 
-> **Course:** ITCS 6190 — Cloud Computing for Data Analysis  
-> **Dataset:** [Amazon E-Commerce Sales Data (Kaggle)](https://www.kaggle.com/datasets/thedevastator/unlock-profits-with-e-commerce-sales-data)
+Name:Vamsi Aakash Samudrala
+Student id : 801425922
+Email: vsamudr2@charlotte.edu
+
+> Course: ITCS 6190 — Cloud Computing for Data Analysis  
+> Dataset: [Amazon E-Commerce Sales Data (Kaggle)](https://www.kaggle.com/datasets/thedevastator/unlock-profits-with-e-commerce-sales-data)
 
 ---
 
-## 📋 Table of Contents
+##  Table of Contents
 
 1. [Project Overview](#project-overview)
 2. [Architecture & Workflow](#architecture--workflow)
@@ -33,11 +37,11 @@ This hands-on demonstrates how to build a **serverless data analytics pipeline**
 
 | AWS Service | Role in Pipeline |
 |---|---|
-| **Amazon S3** | Raw data lake — stores the uploaded CSV dataset |
-| **AWS IAM** | Security — grants Glue the permissions needed to read S3 |
-| **AWS Glue** | ETL / Cataloging — crawls S3 and creates a queryable table schema |
-| **Amazon CloudWatch** | Observability — monitors and logs the Glue crawler run |
-| **Amazon Athena** | Analytics — runs standard SQL directly against S3 data via the Glue catalog |
+| Amazon S3 | Raw data lake — stores the uploaded CSV dataset |
+| AWS IAM | Security — grants Glue the permissions needed to read S3 |
+| AWS Glue | ETL / Cataloging — crawls S3 and creates a queryable table schema |
+| Amazon CloudWatch | Observability — monitors and logs the Glue crawler run |
+| Amazon Athena | Analytics — runs standard SQL directly against S3 data via the Glue catalog |
 
 No servers, no databases to provision — just upload data and query.
 
@@ -57,7 +61,7 @@ No servers, no databases to provision — just upload data and query.
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-**Workflow Steps:**
+Workflow Steps:
 1. Configure Amazon S3 buckets (`raw/` for input, `process/` for output)
 2. Create an IAM role granting Glue access to S3
 3. Create and run a Glue crawler to auto-discover the schema
@@ -72,7 +76,7 @@ No servers, no databases to provision — just upload data and query.
 
 **Approach:** Amazon S3 (Simple Storage Service) serves as the data lake for this pipeline. Two folders are created inside one bucket to separate raw ingested data from any processed outputs.
 
-**What was done:**
+What was done:
 - Created a general-purpose S3 bucket named **`handsonn11cloudcomputingg`** in the `us-east-1` (N. Virginia) region
 - Created two folders inside the bucket:
   - `raw/` — where the Amazon sales CSV dataset is uploaded
@@ -82,7 +86,7 @@ No servers, no databases to provision — just upload data and query.
 
 
 
-> 📌 **Bucket:** `handsonn11cloudcomputingg` | **Region:** us-east-1 | **Objects:** 2 folders (`process/`, `raw/`)
+> Bucket: `handsonn11cloudcomputingg` | **Region:** us-east-1 | **Objects:** 2 folders (`process/`, `raw/`)
 <img width="1710" height="1107" alt="Amazon_S3" src="https://github.com/user-attachments/assets/b53bb8b0-a7cd-4dd2-92a5-d5111f6f3a2e" />
 
 ---
@@ -97,11 +101,12 @@ No servers, no databases to provision — just upload data and query.
 - Attached policies granting S3 read access and Glue catalog write access
 - Named the role **`GlueRole`**
 
-**Why this matters:** Without this role, the Glue crawler cannot read objects from S3 or write table metadata to the Glue Data Catalog. The role is assigned directly to the crawler in the next step.
+Why this matters: Without this role, the Glue crawler cannot read objects from S3 or write table metadata to the Glue Data Catalog. The role is assigned directly to the crawler in the next step.
 
-![IAM Roles](IAM_Roles.png)
 
-> 📌 **Roles visible:** `GlueRole` (AWS Service: glue) — Last activity: 6 hours ago. Three other auto-generated AWS service roles are also listed.
+<img width="1710" height="1107" alt="IAM_Roles" src="https://github.com/user-attachments/assets/4a63e9cd-cad6-430e-aba8-eb826b6a2ef8" />
+
+> Roles visible:`GlueRole` (AWS Service: glue) — Last activity: 6 hours ago. Three other auto-generated AWS service roles are also listed.
 
 ---
 
@@ -109,7 +114,7 @@ No servers, no databases to provision — just upload data and query.
 
 **Approach:** AWS Glue Crawler automatically inspects the data in S3, infers the schema (column names, data types), and registers a table in the Glue Data Catalog. This eliminates the need to manually define table schemas.
 
-**What was done:**
+What was done:
 - Created a crawler named **`Crawlerrr`** in AWS Glue Studio
 - Configured the data source as the `raw/` folder in the S3 bucket
 - Assigned the `GlueRole` IAM role created in Step 2
@@ -117,59 +122,51 @@ No servers, no databases to provision — just upload data and query.
 - Ran the crawler — it completed in ~40–43 seconds across two runs
 - Both runs reported **"1 table change, 0 partition changes"** confirming the `raw` table was created/updated
 
-**Why this matters:** The crawler bridges S3 and Athena. Without it, Athena has no schema to work with and cannot interpret the CSV file as a structured table.
+Why this matters: The crawler bridges S3 and Athena. Without it, Athena has no schema to work with and cannot interpret the CSV file as a structured table.
 
-![AWS Glue Crawler](AWS_Glue_Crawler.png)
+<img width="1710" height="1107" alt="AWS_Glue_Crawler" src="https://github.com/user-attachments/assets/48606bde-182b-4e4c-a2d0-913388011db6" />
 
-> 📌 **Crawler:** `Crawlerrr` | **State:** READY | **Database:** `outputgluedatabase` | **IAM Role:** GlueRole  
-> **Runs:** 2 completed — April 7, 2026 at 15:56 and 16:11 UTC
+
+> Crawler: `Crawlerrr` | **State:** READY | **Database:** `outputgluedatabase` | **IAM Role:** GlueRole  
+> Runs:2 completed — April 7, 2026 at 15:56 and 16:11 UTC
 
 ---
 
 ### Step 4 — CloudWatch Monitoring
 
-**Approach:** Amazon CloudWatch captures all log events emitted by the Glue crawler during its run. This provides full observability into what the crawler did — from start to finish — without needing to SSH into any server.
+Approach: Amazon CloudWatch captures all log events emitted by the Glue crawler during its run. This provides full observability into what the crawler did — from start to finish — without needing to SSH into any server.
 
-**What was done:**
+What was done:
 - Navigated from the Glue Crawler page → "View CloudWatch logs"
 - Filtered logs by the crawler run ID: `7237fecf-a595-4e8d-b730-b282bc1342f8`
 - Observed the complete lifecycle of the crawler run in chronological order
 
-**Key log events observed:**
+Why this matters:** CloudWatch confirms the crawler successfully classified the data, created the `raw` table in the Glue catalog, and terminated cleanly — essential for debugging if anything goes wrong.
 
-| Timestamp (UTC) | Event |
-|---|---|
-| 16:11:20 | `BENCHMARK: Running Start Crawl for Crawler Crawlerrr` |
-| 16:11:35 | `BENCHMARK: Classification complete, writing results to database outputgluedatabase` |
-| 16:11:57 | `INFO: Created table raw in database outputgluedatabase` |
-| 16:11:57 | `BENCHMARK: Finished writing to Catalog` |
-| 16:11:58 | `BENCHMARK: Crawler has finished running and is in state READY` |
-| 16:11:58 | `INFO: Run Summary For TABLE — ADD: 1` |
 
-**Why this matters:** CloudWatch confirms the crawler successfully classified the data, created the `raw` table in the Glue catalog, and terminated cleanly — essential for debugging if anything goes wrong.
+<img width="1710" height="1107" alt="CloudWatch" src="https://github.com/user-attachments/assets/a54cb884-7089-4a90-a4d4-6ba44efeca75" />
 
-![CloudWatch Logs](CloudWatch.png)
-
-> 📌 **Log Group:** `/aws-glue/crawlers` | **Log Stream:** `Crawlerrr` | **Result:** Table `raw` added to `outputgluedatabase`
+> Log Group: `/aws-glue/crawlers` | **Log Stream:** `Crawlerrr` | **Result:** Table `raw` added to `outputgluedatabase`
 
 ---
 
 ### Step 5 — Amazon Athena Query Editor
 
-**Approach:** Amazon Athena is a serverless interactive query service that uses standard ANSI SQL to query data directly in S3 through the Glue Data Catalog. There is no need to load data into a separate database — Athena queries the CSV files in-place.
+Approach: Amazon Athena is a serverless interactive query service that uses standard ANSI SQL to query data directly in S3 through the Glue Data Catalog. There is no need to load data into a separate database — Athena queries the CSV files in-place.
 
-**What was done:**
+What was done:
 - Opened Athena Query Editor in the AWS Console
 - Set the data source to **`AwsDataCatalog`** and the database to **`outputgluedatabase`**
 - Confirmed two tables available: `amazon_sale_report_csv` and `raw`
 - Set the workgroup to **`primary`** and configured an S3 query results location
 - Ran 5 analytical queries (detailed below)
 
-**Why this matters:** Athena provides on-demand SQL analytics at scale with no infrastructure management. Charges are per query based on data scanned — efficient partitioning and filtering directly reduce cost.
+Why this matters:Athena provides on-demand SQL analytics at scale with no infrastructure management. Charges are per query based on data scanned — efficient partitioning and filtering directly reduce cost.
+<img width="1710" height="1107" alt="Athena" src="https://github.com/user-attachments/assets/ce49cdc0-3678-4413-b961-66e0c22748d3" />
 
-![Athena Query Editor](Athena.png)
 
-> 📌 **Data Source:** AwsDataCatalog | **Database:** outputgluedatabase | **Tables:** `raw`, `amazon_sale_report_csv`
+
+> Data Source: AwsDataCatalog | **Database:** outputgluedatabase | **Tables:** `raw`, `amazon_sale_report_csv`
 
 ---
 
@@ -184,9 +181,9 @@ WHERE LOWER(status) NOT IN ('cancelled', 'pending', 'pending - waiting for pick 
 
 ### Query 1 — Basic Table Exploration
 
-**Objective:** Retrieve the first 10 records to understand the dataset structure — column names, data types, and sample values.
+Objective: Retrieve the first 10 records to understand the dataset structure — column names, data types, and sample values.
 
-**Approach:** A simple `SELECT *` with `LIMIT 10` to preview the raw data before writing analytical queries. This is always the first step in any data exploration workflow.
+**Approach: A simple `SELECT *` with `LIMIT 10` to preview the raw data before writing analytical queries. This is always the first step in any data exploration workflow.
 
 ```sql
 SELECT *
@@ -195,12 +192,14 @@ LIMIT 10;
 ```
 
 **Query Screenshot:**
+<img width="1710" height="1107" alt="Q1" src="https://github.com/user-attachments/assets/4e1255f5-08df-4441-955d-04eabf690736" />
 
-![Q1 Query](Q1.png)
+
 
 **Results Screenshot:**
+<img width="1710" height="1107" alt="Q1_Result" src="https://github.com/user-attachments/assets/a0332c58-e0bf-4655-b2db-08cd588b52f0" />
 
-![Q1 Result](Q1_Result.png)
+
 
 **Findings:** The dataset contains columns including `index`, `order id`, `date`, `status`, `fulfilment`, `sales-channel`, `ship-service-level`, `style`, `sku`, `category`, `size`, `asin`, `courier status`, `qty`, `currency`, `amount`, `ship-city`, `ship-state`, `ship-postal-code`, `ship-country`, and `b2b`. Data is from April–June 2022, Amazon India marketplace. Orders have statuses like Shipped, Cancelled, and "Shipped - Delivered to Buyer".
 
@@ -225,12 +224,14 @@ LIMIT 10;
 ```
 
 **Query Screenshot:**
+<img width="1710" height="1107" alt="Q2" src="https://github.com/user-attachments/assets/ea7a6554-ea45-4117-9c6e-8cf36db3417f" />
 
-![Q2 Query](Q2.png)
+
 
 **Results Screenshot:**
 
-![Q2 Result](Q2_Result.png)
+<img width="1710" height="1107" alt="Q2_Result" src="https://github.com/user-attachments/assets/a9d24b4d-a4ca-4b36-8e3e-ae604af723e0" />
+
 
 **Findings:** 9 product categories found. **Set** leads with 50,284 orders, followed by **Kurta** (49,877) and **Western Dress** (15,500). At the bottom are **Saree** (164) and **Dupatta** (3). Sets and Kurtas together account for ~75% of all orders, indicating these are the core product lines.
 
@@ -259,11 +260,13 @@ LIMIT 10;
 
 **Query Screenshot:**
 
-![Q3 Query](Q3.png)
+<img width="1710" height="1107" alt="Q3" src="https://github.com/user-attachments/assets/19a7c100-a9ea-4bf8-b865-dd1068b9f996" />
+
 
 **Results Screenshot:**
 
-![Q3 Result](Q3_Result.png)
+<img width="1710" height="1107" alt="Q3_Result" src="https://github.com/user-attachments/assets/f53e8e77-b1d3-4b72-be5e-9d3b23c696a0" />
+
 
 **Findings:** Amazon fulfillment dominates with **77,812 orders** generating **~$50.3M** in revenue (78,017 units), while Merchant fulfillment handled **31,892 orders** generating **~$20.7M** (32,035 units). Amazon-fulfilled orders produce roughly **2.4× the revenue** of merchant-fulfilled — suggesting either higher-value products or greater volume through the Amazon channel.
 
@@ -289,15 +292,16 @@ ORDER BY sales_month ASC
 LIMIT 10;
 ```
 
-**Query Screenshot:**
+Query Screenshot:
+<img width="1710" height="1107" alt="Q4" src="https://github.com/user-attachments/assets/e3ef92e3-1efd-4a3d-9f49-395e079297c8" />
 
-![Q4 Query](Q4.png)
 
-**Results Screenshot:**
+Results Screenshot:
+<img width="1710" height="1107" alt="Q4_Result" src="https://github.com/user-attachments/assets/5d115d60-269f-4edb-9d81-60f73e505fd4" />
 
-![Q4 Result](Q4_Result.png)
 
-**Findings:** The dataset spans 4 months (March–June 2022). March 2022 had only **153 orders** ($94,810 revenue) — likely a partial month of data. April 2022 was the peak with **41,929 orders** (~$26.2M revenue). May (36,158 orders, ~$23.9M) and June (31,464 orders, ~$20.8M) show a declining trend, possibly reflecting post-peak seasonal correction.
+
+Findings:The dataset spans 4 months (March–June 2022). March 2022 had only **153 orders** ($94,810 revenue) — likely a partial month of data. April 2022 was the peak with **41,929 orders** (~$26.2M revenue). May (36,158 orders, ~$23.9M) and June (31,464 orders, ~$20.8M) show a declining trend, possibly reflecting post-peak seasonal correction.
 
 > ⏱ **Run time:** 912 ms | **Data scanned:** 65.73 MB | **Results:** 4 rows
 
@@ -331,33 +335,18 @@ WHERE rnk <= 5
 ORDER BY category, rnk
 LIMIT 10;
 ```
+Query Screenshot:
 
-**Query Screenshot:**
+<img width="1710" height="1107" alt="Q5" src="https://github.com/user-attachments/assets/1fbc85d6-207a-490e-9924-21e7c8e51584" />
 
-![Q5 Query](Q5.png)
 
 **Results Screenshot:**
 
-![Q5 Result](Q5_Result.png)
+<img width="1710" height="1107" alt="Q5_Result" src="https://github.com/user-attachments/assets/270cb63a-f1e3-476b-b4a4-335f902a85a8" />
 
-**Findings:** For **Blouse** category, SKU `J0217-BL-L` ranks #1 with $20,275 revenue (30 units sold). For **Bottom** category, SKU `BTM031-NP-XL` leads with $2,590 revenue (5 units). Blouse SKUs consistently generate higher per-SKU revenues than Bottom SKUs. The window function approach ensures each category has its own independent ranking — a standard pattern for top-N-per-group analytics.
 
-> ⏱ **Run time:** 904 ms | **Data scanned:** 65.73 MB | **Results:** 10 rows (showing Blouse & Bottom categories)
-
----
-
-## Key Findings
-
-| Insight | Detail |
-|---|---|
-| 🏆 **Top Category** | Set (50,284 orders) and Kurta (49,877 orders) dominate |
-| 💰 **Fulfilment Leader** | Amazon fulfillment = ~2.4× the revenue of Merchant fulfillment |
-| 📅 **Peak Month** | April 2022 — 41,929 orders, ~$26.2M revenue |
-| 📉 **Trend** | Declining order volume from April → June 2022 |
-| 🔑 **Top SKU (Blouse)** | `J0217-BL-L` — $20,275 total revenue |
-| 🔑 **Top SKU (Bottom)** | `BTM031-NP-XL` — $2,590 total revenue |
-
----
+Findings:For Blouse** category, SKU `J0217-BL-L` ranks #1 with $20,275 revenue (30 units sold). For **Bottom** category, SKU `BTM031-NP-XL` leads with $2,590 revenue (5 units). Blouse SKUs consistently generate higher per-SKU revenues than Bottom SKUs. The window function approach ensures each category has its own independent ranking — a standard pattern for top-N-per-group analytics.
+|
 
 ## Repository Structure
 
@@ -395,59 +384,24 @@ LIMIT 10;
 
 ---
 
-## ⚠️ Challenges Faced
+##Challenges Faced
 
 ### Challenge 1 — Athena Query Results Location Not Configured
-**Problem:** When first opening Athena, running any query immediately threw an error: *"Query result location not set."* Athena requires an S3 path to write query results before it can execute anything.
-
-**Resolution:** Navigated to Athena → Settings → Manage → specified the `process/` folder of the S3 bucket (`s3://handsonn11cloudcomputingg/process/`) as the query result location. After saving, all queries ran successfully.
-
----
+Problem:When first opening Athena, running any query immediately threw an error: *"Query result location not set."* Athena requires an S3 path to write query results before it can execute anything.
 
 ### Challenge 2 — Date Column Stored as String, Not DATE Type
-**Problem:** The `date` column in the dataset (format `MM-DD-YY`, e.g., `04-30-22`) was ingested by the Glue crawler as a plain `string` type. Athena does not automatically cast string columns to dates, so using standard date functions like `DATE_TRUNC` directly on the column caused a type mismatch error.
-
-**Resolution:** Used `DATE_PARSE(date, '%m-%d-%y')` to explicitly convert the string to a proper timestamp before applying `DATE_TRUNC('month', ...)`. This two-step approach — parse then truncate — resolved the issue and produced correct monthly groupings.
-
-```sql
--- Fix: wrap the string column with DATE_PARSE before truncating
-DATE_TRUNC('month', DATE_PARSE(date, '%m-%d-%y')) AS sales_month
-```
-
+Problem: The `date` column in the dataset (format `MM-DD-YY`, e.g., `04-30-22`) was ingested by the Glue crawler as a plain `string` type. Athena does not automatically cast string columns to dates, so using standard date functions like `DATE_TRUNC` directly on the column caused a type mismatch error.
 ---
-
 ### Challenge 3 — Glue Crawler Ran Twice Due to Schema Mismatch
-**Problem:** The Glue crawler was run a first time but the resulting table schema did not match expectations — some column names had hyphens (e.g., `ship-service-level`) which required quoting in SQL. A second run was triggered after verifying the S3 data source path was correctly pointed at the `raw/` prefix.
-
-**Resolution:** Confirmed the crawler data source path, re-ran it, and both runs completed successfully (40s and 43s). The second run registered as "1 table change" confirming the catalog was refreshed. CloudWatch logs were used to verify each run completed cleanly.
-
----
 
 ### Challenge 4 — Revenue Values Displayed in Scientific Notation
-**Problem:** In Query 3 and Query 4 results, the `total_revenue` column was displayed in scientific notation (e.g., `5.0324255E7`) in the Athena UI, making it difficult to read at a glance.
-
-**Resolution:** Wrapped the `SUM(amount)` aggregation with `ROUND(..., 2)` to force Athena to output a standard decimal number. For the monthly trend query where values remained large, the scientific notation persisted in the UI display — but the underlying values are correct and render normally when downloaded as CSV.
-
----
+**Problem: In Query 3 and Query 4 results, the `total_revenue` column was displayed in scientific notation (e.g., `5.0324255E7`) in the Athena UI, making it difficult to read at a glance.
 
 ### Challenge 5 — Filtering Pending Orders Required LOWER() Normalization
-**Problem:** The `status` column contained inconsistent casing and values. A simple `WHERE status != 'Cancelled'` filter was insufficient because some records had `'cancelled'` (lowercase) or variations like `'Pending - Waiting for Pick Up'` with mixed casing.
-
-**Resolution:** Applied `LOWER(status)` to normalize all values before comparison, and used `NOT IN` with all known non-completed status strings:
-```sql
-WHERE LOWER(status) NOT IN ('cancelled', 'pending', 'pending - waiting for pick up')
-```
-This ensured no cancelled or pending records slipped through due to case differences.
-
----
+Problem: The `status` column contained inconsistent casing and values. A simple `WHERE status != 'Cancelled'` filter was insufficient because some records had `'cancelled'` (lowercase) or variations like `'Pending - Waiting for Pick Up'` with mixed casing.
 
 ### Challenge 6 — IAM Role Permissions Had to Be Correctly Scoped
-**Problem:** The initial attempt to run the Glue crawler failed because the IAM role did not have sufficient permissions to write metadata to the Glue Data Catalog, even though S3 read access was in place.
+Problem:The initial attempt to run the Glue crawler failed because the IAM role did not have sufficient permissions to write metadata to the Glue Data Catalog, even though S3 read access was in place.
 
-**Resolution:** Attached the `AWSGlueServiceRole` managed policy to the `GlueRole`, which bundles the necessary permissions for Glue to read from S3, write to the Data Catalog, and publish logs to CloudWatch. After updating the role, the crawler ran successfully on the next attempt.
 
----
 
-> **AWS Services Used:** Amazon S3 · AWS IAM · AWS Glue · Amazon CloudWatch · Amazon Athena  
-> **Region:** us-east-1 (N. Virginia)  
-> **Dataset:** Amazon India E-Commerce Sales, April–June 2022
