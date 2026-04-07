@@ -85,9 +85,6 @@ What was done:
 
 **Why this matters:** Glue needs a well-defined S3 path to point its crawler at. The `raw/` prefix acts as the data source, and separating it from `process/` is a best-practice pattern for data lake organization.
 
-
-
-> Bucket: `handsonn11cloudcomputingg` | **Region:** us-east-1 | **Objects:** 2 folders (`process/`, `raw/`)
 <img width="1710" height="1107" alt="Amazon_S3" src="https://github.com/user-attachments/assets/b53bb8b0-a7cd-4dd2-92a5-d5111f6f3a2e" />
 
 ---
@@ -107,9 +104,6 @@ Why this matters: Without this role, the Glue crawler cannot read objects from S
 
 <img width="1710" height="1107" alt="IAM_Roles" src="https://github.com/user-attachments/assets/4a63e9cd-cad6-430e-aba8-eb826b6a2ef8" />
 
-> Roles visible:`GlueRole` (AWS Service: glue) — Last activity: 6 hours ago. Three other auto-generated AWS service roles are also listed.
-
----
 
 ### Step 3 — AWS Glue Crawler
 
@@ -128,11 +122,6 @@ Why this matters: The crawler bridges S3 and Athena. Without it, Athena has no s
 <img width="1710" height="1107" alt="AWS_Glue_Crawler" src="https://github.com/user-attachments/assets/48606bde-182b-4e4c-a2d0-913388011db6" />
 
 
-> Crawler: `Crawlerrr` | **State:** READY | **Database:** `outputgluedatabase` | **IAM Role:** GlueRole  
-> Runs:2 completed — April 7, 2026 at 15:56 and 16:11 UTC
-
----
-
 ### Step 4 — CloudWatch Monitoring
 
 Approach: Amazon CloudWatch captures all log events emitted by the Glue crawler during its run. This provides full observability into what the crawler did — from start to finish — without needing to SSH into any server.
@@ -147,9 +136,6 @@ Why this matters:** CloudWatch confirms the crawler successfully classified the 
 
 <img width="1710" height="1107" alt="CloudWatch" src="https://github.com/user-attachments/assets/a54cb884-7089-4a90-a4d4-6ba44efeca75" />
 
-> Log Group: `/aws-glue/crawlers` | **Log Stream:** `Crawlerrr` | **Result:** Table `raw` added to `outputgluedatabase`
-
----
 
 ### Step 5 — Amazon Athena Query Editor
 
@@ -165,11 +151,6 @@ What was done:
 Why this matters:Athena provides on-demand SQL analytics at scale with no infrastructure management. Charges are per query based on data scanned — efficient partitioning and filtering directly reduce cost.
 <img width="1710" height="1107" alt="Athena" src="https://github.com/user-attachments/assets/ce49cdc0-3678-4413-b961-66e0c22748d3" />
 
-
-
-> Data Source: AwsDataCatalog | **Database:** outputgluedatabase | **Tables:** `raw`, `amazon_sale_report_csv`
-
----
 
 ## SQL Queries & Results
 
