@@ -80,9 +80,10 @@ No servers, no databases to provision — just upload data and query.
 
 **Why this matters:** Glue needs a well-defined S3 path to point its crawler at. The `raw/` prefix acts as the data source, and separating it from `process/` is a best-practice pattern for data lake organization.
 
-![Amazon S3 Bucket](Amazon_S3.png)
+
 
 > 📌 **Bucket:** `handsonn11cloudcomputingg` | **Region:** us-east-1 | **Objects:** 2 folders (`process/`, `raw/`)
+<img width="1710" height="1107" alt="Amazon_S3" src="https://github.com/user-attachments/assets/b53bb8b0-a7cd-4dd2-92a5-d5111f6f3a2e" />
 
 ---
 
