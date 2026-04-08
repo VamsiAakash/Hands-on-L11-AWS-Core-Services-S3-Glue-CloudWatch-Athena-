@@ -27,8 +27,7 @@ Email: vsamudr2@charlotte.edu
    - [Query 4 — Monthly Sales Trend](#query-4--monthly-sales-trend)
    - [Query 5 — Top 5 Best-Selling SKUs per Category](#query-5--top-5-best-selling-skus-per-category)
 5. [Key Findings](#key-findings)
-6. [Repository Structure](#repository-structure)
-7. [Challenges Faced](#challenges-faced)
+6. [Challenges Faced](#challenges-faced)
 
 ---
 
