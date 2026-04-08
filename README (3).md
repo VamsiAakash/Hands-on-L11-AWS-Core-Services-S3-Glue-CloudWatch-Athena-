@@ -289,26 +289,21 @@ Query Screenshot:
 
 
 Findings:For Blouse** category, SKU `J0217-BL-L` ranks #1 with $20,275 revenue (30 units sold). For **Bottom** category, SKU `BTM031-NP-XL` leads with $2,590 revenue (5 units). Blouse SKUs consistently generate higher per-SKU revenues than Bottom SKUs. The window function approach ensures each category has its own independent ranking — a standard pattern for top-N-per-group analytics.
+ 
+Challenges Faced:
 
-
-##Challenges Faced
-
-### Challenge 1 — Athena Query Results Location Not Configured
-Problem:When first opening Athena, running any query immediately threw an error: *"Query result location not set."* Athena requires an S3 path to write query results before it can execute anything.
-
-### Challenge 2 — Date Column Stored as String, Not DATE Type
-Problem: The `date` column in the dataset (format `MM-DD-YY`, e.g., `04-30-22`) was ingested by the Glue crawler as a plain `string` type. Athena does not automatically cast string columns to dates, so using standard date functions like `DATE_TRUNC` directly on the column caused a type mismatch error.
-
-### Challenge 3 — Glue Crawler Ran Twice Due to Schema Mismatch
-
-### Challenge 4 — Revenue Values Displayed in Scientific Notation
-**Problem: In Query 3 and Query 4 results, the `total_revenue` column was displayed in scientific notation (e.g., `5.0324255E7`) in the Athena UI, making it difficult to read at a glance.
-
-### Challenge 5 — Filtering Pending Orders Required LOWER() Normalization
-Problem: The `status` column contained inconsistent casing and values. A simple `WHERE status != 'Cancelled'` filter was insufficient because some records had `'cancelled'` (lowercase) or variations like `'Pending - Waiting for Pick Up'` with mixed casing.
-
-### Challenge 6 — IAM Role Permissions Had to Be Correctly Scoped
-Problem:The initial attempt to run the Glue crawler failed because the IAM role did not have sufficient permissions to write metadata to the Glue Data Catalog, even though S3 read access was in place.
+1. Athena query results location not set.
+When opening Athena for the first time, queries would not run because no S3 output path was configured. This was fixed by going into Athena Settings and pointing the results location to the process/ folder in the S3 bucket.
+2. The date column was stored as a plain string.
+The Glue crawler read the date column as text instead of a date type, so date functions like DATE_TRUNC did not work directly on it. The fix was to first convert it using DATE_PARSE before applying any date grouping in the queries.
+3. Glue crawler had to be run twice.
+The first crawler run did not produce the expected schema because the S3 data source path was not correctly set to the raw/ prefix. After correcting the path and re-running, the crawler completed successfully and created the table in the Glue catalog.
+4. Revenue numbers showed up in scientific notation.
+Query results for total revenue were displaying values like 5.03E7 in the Athena UI, which was hard to read. Wrapping the SUM with ROUND(..., 2) helped, though very large values still appeared in scientific notation in the UI — the downloaded CSV showed the correct full numbers.
+5. Order status values had inconsistent casing.
+Filtering out cancelled and pending orders with a simple equality check was not enough because the status column had mixed casing across rows. Using LOWER(status) before the comparison made the filter case-insensitive and caught all variations reliably.
+6. IAM role did not have enough permissions initially.
+The Glue crawler failed on the first attempt because the IAM role only had S3 read access but was missing the permissions needed to write to the Glue Data Catalog and send logs to CloudWatch. Attaching the AWSGlueServiceRole managed policy resolved this.
 
 
 
