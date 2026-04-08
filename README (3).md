@@ -154,18 +154,12 @@ Why this matters:Athena provides on-demand SQL analytics at scale with no infras
 
 ## SQL Queries & Results
 
-All queries run against the `outputgluedatabase.raw` table. Cancelled and pending orders are excluded from revenue/fulfilment queries using:
-```sql
-WHERE LOWER(status) NOT IN ('cancelled', 'pending', 'pending - waiting for pick up')
-```
-
----
 
 ### Query 1 — Basic Table Exploration
 
 Objective: Retrieve the first 10 records to understand the dataset structure — column names, data types, and sample values.
 
-**Approach: A simple `SELECT *` with `LIMIT 10` to preview the raw data before writing analytical queries. This is always the first step in any data exploration workflow.
+Approach: A simple `SELECT *` with `LIMIT 10` to preview the raw data before writing analytical queries. This is always the first step in any data exploration workflow.
 
 ```sql
 SELECT *
@@ -183,17 +177,15 @@ LIMIT 10;
 
 
 
-**Findings:** The dataset contains columns including `index`, `order id`, `date`, `status`, `fulfilment`, `sales-channel`, `ship-service-level`, `style`, `sku`, `category`, `size`, `asin`, `courier status`, `qty`, `currency`, `amount`, `ship-city`, `ship-state`, `ship-postal-code`, `ship-country`, and `b2b`. Data is from April–June 2022, Amazon India marketplace. Orders have statuses like Shipped, Cancelled, and "Shipped - Delivered to Buyer".
+Findings:The dataset contains columns including `index`, `order id`, `date`, `status`, `fulfilment`, `sales-channel`, `ship-service-level`, `style`, `sku`, `category`, `size`, `asin`, `courier status`, `qty`, `currency`, `amount`, `ship-city`, `ship-state`, `ship-postal-code`, `ship-country`, and `b2b`. Data is from April–June 2022, Amazon India marketplace. Orders have statuses like Shipped, Cancelled, and "Shipped - Delivered to Buyer".
 
-> ⏱ **Run time:** 711 ms | **Data scanned:** 1.54 MB | **Results:** 10 rows
 
----
 
 ### Query 2 — Orders by Product Category
 
-**Objective:** Count how many orders exist per product category to understand which categories are most popular.
+Objective: Count how many orders exist per product category to understand which categories are most popular.
 
-**Approach:** Aggregate by `category` using `COUNT(*)`, then sort descending by `total_orders` to surface the top-selling categories first. No status filter is applied here — all orders including cancelled are counted to reflect total demand volume.
+Approach: Aggregate by `category` using `COUNT(*)`, then sort descending by `total_orders` to surface the top-selling categories first. No status filter is applied here — all orders including cancelled are counted to reflect total demand volume.
 
 ```sql
 SELECT
@@ -217,9 +209,7 @@ LIMIT 10;
 
 **Findings:** 9 product categories found. **Set** leads with 50,284 orders, followed by **Kurta** (49,877) and **Western Dress** (15,500). At the bottom are **Saree** (164) and **Dupatta** (3). Sets and Kurtas together account for ~75% of all orders, indicating these are the core product lines.
 
-> ⏱ **Run time:** 1.112 sec | **Data scanned:** 65.73 MB | **Results:** 9 rows
 
----
 
 ### Query 3 — Revenue and Quantity by Fulfilment Method
 
@@ -252,9 +242,6 @@ LIMIT 10;
 
 **Findings:** Amazon fulfillment dominates with **77,812 orders** generating **~$50.3M** in revenue (78,017 units), while Merchant fulfillment handled **31,892 orders** generating **~$20.7M** (32,035 units). Amazon-fulfilled orders produce roughly **2.4× the revenue** of merchant-fulfilled — suggesting either higher-value products or greater volume through the Amazon channel.
 
-> ⏱ **Run time:** 1.008 sec | **Data scanned:** 65.73 MB | **Results:** 2 rows
-
----
 
 ### Query 4 — Monthly Sales Trend
 
@@ -285,9 +272,6 @@ Results Screenshot:
 
 Findings:The dataset spans 4 months (March–June 2022). March 2022 had only **153 orders** ($94,810 revenue) — likely a partial month of data. April 2022 was the peak with **41,929 orders** (~$26.2M revenue). May (36,158 orders, ~$23.9M) and June (31,464 orders, ~$20.8M) show a declining trend, possibly reflecting post-peak seasonal correction.
 
-> ⏱ **Run time:** 912 ms | **Data scanned:** 65.73 MB | **Results:** 4 rows
-
----
 
 ### Query 5 — Top 5 Best-Selling SKUs per Category
 
@@ -328,43 +312,7 @@ Query Screenshot:
 
 
 Findings:For Blouse** category, SKU `J0217-BL-L` ranks #1 with $20,275 revenue (30 units sold). For **Bottom** category, SKU `BTM031-NP-XL` leads with $2,590 revenue (5 units). Blouse SKUs consistently generate higher per-SKU revenues than Bottom SKUs. The window function approach ensures each category has its own independent ranking — a standard pattern for top-N-per-group analytics.
-|
 
-## Repository Structure
-
-```
-📁 repository/
-│
-├── 📄 README.md                     ← This file
-│
-├── 📁 queries/
-│   ├── Q1_basic_exploration.sql
-│   ├── Q2_orders_by_category.sql
-│   ├── Q3_revenue_by_fulfilment.sql
-│   ├── Q4_monthly_sales_trend.sql
-│   └── Q5_top_skus_per_category.sql
-│
-├── 📁 results/
-│   ├── Q1_Result.csv
-│   ├── Q2_Result.csv
-│   ├── Q3_Result.csv
-│   ├── Q4_Result.csv
-│   └── Q5_Result.csv
-│
-└── 📁 screenshots/
-    ├── Amazon_S3.png
-    ├── IAM_Roles.png
-    ├── AWS_Glue_Crawler.png
-    ├── CloudWatch.png
-    ├── Athena.png
-    ├── Q1.png  /  Q1_Result.png
-    ├── Q2.png  /  Q2_Result.png
-    ├── Q3.png  /  Q3_Result.png
-    ├── Q4.png  /  Q4_Result.png
-    └── Q5.png  /  Q5_Result.png
-```
-
----
 
 ##Challenges Faced
 
@@ -373,7 +321,7 @@ Problem:When first opening Athena, running any query immediately threw an error:
 
 ### Challenge 2 — Date Column Stored as String, Not DATE Type
 Problem: The `date` column in the dataset (format `MM-DD-YY`, e.g., `04-30-22`) was ingested by the Glue crawler as a plain `string` type. Athena does not automatically cast string columns to dates, so using standard date functions like `DATE_TRUNC` directly on the column caused a type mismatch error.
----
+
 ### Challenge 3 — Glue Crawler Ran Twice Due to Schema Mismatch
 
 ### Challenge 4 — Revenue Values Displayed in Scientific Notation
