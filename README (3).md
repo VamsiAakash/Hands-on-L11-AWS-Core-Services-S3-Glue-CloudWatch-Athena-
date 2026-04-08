@@ -8,28 +8,6 @@ Email: vsamudr2@charlotte.edu
 > Course: ITCS 6190 — Cloud Computing for Data Analysis  
 > Dataset: [Amazon E-Commerce Sales Data (Kaggle)](https://www.kaggle.com/datasets/thedevastator/unlock-profits-with-e-commerce-sales-data)
 
----
-
-##  Table of Contents
-
-1. [Project Overview](#project-overview)
-2. [Architecture & Workflow](#architecture--workflow)
-3. [Step-by-Step Setup](#step-by-step-setup)
-   - [Step 1 — Amazon S3 Bucket Setup](#step-1--amazon-s3-bucket-setup)
-   - [Step 2 — IAM Role Configuration](#step-2--iam-role-configuration)
-   - [Step 3 — AWS Glue Crawler](#step-3--aws-glue-crawler)
-   - [Step 4 — CloudWatch Monitoring](#step-4--cloudwatch-monitoring)
-   - [Step 5 — Amazon Athena Query Editor](#step-5--amazon-athena-query-editor)
-4. [SQL Queries & Results](#sql-queries--results)
-   - [Query 1 — Basic Table Exploration](#query-1--basic-table-exploration)
-   - [Query 2 — Orders by Product Category](#query-2--orders-by-product-category)
-   - [Query 3 — Revenue by Fulfilment Method](#query-3--revenue-by-fulfilment-method)
-   - [Query 4 — Monthly Sales Trend](#query-4--monthly-sales-trend)
-   - [Query 5 — Top 5 Best-Selling SKUs per Category](#query-5--top-5-best-selling-skus-per-category)
-5. [Key Findings](#key-findings)
-6. [Challenges Faced](#challenges-faced)
-
----
 
 ## Project Overview
 
